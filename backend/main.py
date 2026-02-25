@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Load variables from .env
 load_dotenv()
 
-app = FastAPI(title=os.getenv("APP_NAME", "PeaceChainTRM"))
+app = FastAPI(title=os.getenv("APP_NAME", "Circulate"))
 
 @app.get("/healthcheck")
 def read_health():
@@ -15,6 +15,6 @@ def read_health():
     """
     return {
         "status": "online", 
-        "message": "PeaceChainTRM API is running",
+        "message": "Circulate API is running",
         "version": "1.0.0"
     }

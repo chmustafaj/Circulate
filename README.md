@@ -1,1 +1,1 @@
-This is an MVP to score regional risk using ACLED conflict data and NDVI climate data.
+Circulate is a project that connects buyers and sellers through an innovative method, in which the buyers join a queue to show their interest in a product, with a price set by our own models.
