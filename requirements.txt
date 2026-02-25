@@ -1,3 +1,7 @@
-fastapi
-uvicorn[standard]
+fastapi[standard]
+uvicorn
+
 python-dotenv
+pydantic-settings
+
+python-json-logger
