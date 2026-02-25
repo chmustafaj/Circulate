@@ -1,0 +1,1 @@
+This is an MVP to score regional risk using ACLED conflict data and NDVI climate data.
