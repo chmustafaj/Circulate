@@ -7,11 +7,28 @@ services:
     environment:
       - LOG_LEVEL=INFO
       - REDIS_URL=redis://redis:6379/0
+      - REDIS_EVENTS_CHANNEL=domain_events
+      - DATABASE_URL=postgresql+psycopg://circulate:circulate@postgres:5432/circulate
     depends_on:
       - redis
+      - postgres
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=circulate
+      - POSTGRES_USER=circulate
+      - POSTGRES_PASSWORD=circulate
+    ports:
+      - "5432:5432"
+    volumes:
+      - circulate_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  circulate_postgres_data:
 
