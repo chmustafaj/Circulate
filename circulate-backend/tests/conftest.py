@@ -20,9 +20,11 @@ _test_engine = create_engine(f"sqlite:///{_test_db_path}")
 _test_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=_test_engine)
 
 import circulate_backend.infra.db_models  # noqa: F401 - register models with Base
+from circulate_backend.infra.asset_snapshot_immutability import install_asset_snapshot_immutability
 from circulate_backend.infra.db import Base
 
 Base.metadata.create_all(bind=_test_engine)
+install_asset_snapshot_immutability(_test_engine)
 
 import circulate_backend.infra.db as db_module
 
@@ -41,4 +43,5 @@ def _reset_db(monkeypatch):
     yield
     Base.metadata.drop_all(bind=_test_engine)
     Base.metadata.create_all(bind=_test_engine)
+    install_asset_snapshot_immutability(_test_engine)
 
