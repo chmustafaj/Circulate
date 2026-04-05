@@ -1,15 +1,11 @@
-"""Verification API router.
-
-TODO: Add authentication for verification endpoints.
-"""
+"""Verification API router."""
 
 from uuid import UUID
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from circulate_backend.api.schemas.snapshot import SnapshotPayload
 from circulate_backend.domain.verification_service import (
     SnapshotNotFoundError,
     get_snapshot_for_verification,
@@ -21,7 +17,7 @@ router = APIRouter(prefix="/verify", tags=["verify"])
 
 class VerifySnapshotRequest(BaseModel):
     snapshot_id: UUID
-    payload: Optional[SnapshotPayload] = None
+    payload: Optional[Dict[str, Any]] = None
 
 
 @router.post("/snapshot")
@@ -33,7 +29,7 @@ def verify_snapshot_endpoint(body: VerifySnapshotRequest) -> dict:
     """
     try:
         if body.payload is not None:
-            valid = verify_snapshot_payload(body.snapshot_id, body.payload.model_dump(mode="json"))
+            valid = verify_snapshot_payload(body.snapshot_id, body.payload)
             return {"valid": valid}
         stored_hash, stored_payload = get_snapshot_for_verification(body.snapshot_id)
         return {"stored_hash": stored_hash, "stored_payload": stored_payload}

@@ -1,0 +1,42 @@
+{
+  "version": "2026-04-01",
+  "metal_cents_per_mg": {
+    "gold_24k": 8,
+    "gold_22k": 7,
+    "gold_18k": 6,
+    "gold_14k": 5,
+    "gold_10k": 3,
+    "silver_925": 1,
+    "silver_999": 1,
+    "platinum_950": 4
+  },
+  "condition_bps": {
+    "excellent": 10000,
+    "good": 9000,
+    "fair": 7500,
+    "poor": 5000
+  },
+  "category_anchors_cents": {
+    "jewelry.wristwatch": 500000,
+    "jewelry.bracelet": 150000,
+    "jewelry.necklace": 200000,
+    "jewelry.ring": 100000,
+    "jewelry.other": 100000,
+    "electronics.phone": 80000,
+    "electronics.laptop": 120000,
+    "electronics.other": 50000,
+    "collectibles.coin": 50000,
+    "collectibles.other": 30000,
+    "other.other": 20000
+  },
+  "time_rates": {
+    "fabrication_cents_per_minute": 50,
+    "skill_cents_per_minute": 75
+  },
+  "policy": {
+    "metal_cap_bps": 11500,
+    "metal_floor_bps": 7000,
+    "product_valuation_cap_bps": 13000,
+    "product_valuation_floor_bps": 5000
+  }
+}

@@ -56,12 +56,16 @@ def main() -> None:
     Base.metadata.create_all(bind=engine)
     install_asset_snapshot_immutability(engine)
 
-    payload = {
-        "fair_max_cents": 80000,
+    freeze_request = {
+        "valuation_method": "metal",
         "category": "jewelry",
-        "serial_number": "SN-DEMO-001",
-        "materials": "gold",
         "condition": "good",
+        "serial_number": "SN-DEMO-001",
+        "materials_description": "gold",
+        "metal": {
+            "metal_profile": "gold_14k",
+            "weight_mg": 24300,
+        },
         "photo_urls": ["https://example.com/demo-watch.jpg"],
     }
 
@@ -69,8 +73,8 @@ def main() -> None:
     pause("Enter to create asset + freeze snapshot… ")
 
     banner(1, "Frozen snapshot")
-    asset = create_asset()
-    snapshot = freeze_snapshot(asset.id, payload)
+    asset, _draft_snap = create_asset()
+    snapshot = freeze_snapshot(asset.id, freeze_request)
     sid, aid = str(snapshot.id), str(asset.id)
     print(f"asset_id={aid}\nsnapshot_id={sid}\nhash={snapshot.snapshot_hash_sha256}")
     pg_header("inspect rows after freeze (paste each query; expect one row each)")
@@ -80,7 +84,7 @@ def main() -> None:
         f"WHERE id = '{aid}'::uuid;\n"
     )
     print(
-        f"SELECT id, asset_id, snapshot_version, snapshot_hash_sha256, snapshot_payload, frozen_at\n"
+        f"SELECT id, asset_id, snapshot_version, status, snapshot_hash_sha256, snapshot_payload, frozen_at\n"
         f"FROM asset_snapshots\n"
         f"WHERE id = '{sid}'::uuid;\n"
     )
@@ -97,7 +101,7 @@ def main() -> None:
     pause("Enter for Step 2… ")
 
     banner(2, "Verify via Postman or curl (you run the request)")
-    verify_body = {"snapshot_id": sid, "payload": payload}
+    verify_body = {"snapshot_id": sid, "payload": dict(snapshot.snapshot_payload)}
     verify_json = json.dumps(verify_body)
     verify_json_pretty = json.dumps(verify_body, indent=2)
 
@@ -153,28 +157,9 @@ def main() -> None:
     )
     print("--- Inspect the frozen snapshot row ---")
     print(
-        f"SELECT id, snapshot_version, snapshot_hash_sha256, snapshot_payload, frozen_at\n"
+        f"SELECT id, snapshot_version, status, snapshot_hash_sha256, snapshot_payload, frozen_at\n"
         f"FROM asset_snapshots\n"
         f"WHERE id = '{sid}'::uuid;\n"
-    )
-    print(
-        "Check: snapshot_payload still shows fair_max_cents 80000 (and matches what you froze).\n"
-        f"      snapshot_hash_sha256 should still be:\n      {snapshot.snapshot_hash_sha256}\n"
-    )
-    print("--- Cross-check hash_log matches the snapshot table ---")
-    print(
-        "SELECT s.snapshot_hash_sha256 AS on_snapshot,\n"
-        "       hl.sha256 AS on_hash_log,\n"
-        "       s.snapshot_hash_sha256 = hl.sha256 AS same_hash\n"
-        "FROM asset_snapshots s\n"
-        "JOIN hash_log hl\n"
-        "  ON hl.subject_type = 'asset_snapshot'\n"
-        " AND hl.subject_id = s.id::text\n"
-        f"WHERE s.id = '{sid}'::uuid;\n"
-    )
-    print(
-        "Expect: same_hash = true. (App-level SHA256-of-canonical-JSON is what /verify/snapshot uses;\n"
-        "these queries show the stored row + audit log are still consistent.)\n"
     )
     print("Done.\n")
 

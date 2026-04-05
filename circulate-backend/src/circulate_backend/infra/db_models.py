@@ -3,6 +3,8 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
+from typing import Optional
+
 from sqlalchemy import JSON, Boolean, DateTime, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -41,9 +43,10 @@ class AssetSnapshot(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     asset_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
     snapshot_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="DRAFT", index=True)
     snapshot_payload: Mapped[dict] = mapped_column(JSON, nullable=False)
-    snapshot_hash_sha256: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    frozen_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow, index=True)
+    snapshot_hash_sha256: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, index=True)
+    frozen_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
 
 
 class Hold(Base):
